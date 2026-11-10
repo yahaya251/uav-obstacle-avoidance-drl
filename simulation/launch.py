@@ -72,7 +72,7 @@ def wait_for_gazebo(stack):
         try:
             service = subprocess.run(
                 ["gz", "service", "-i", "-s", f"/world/{WORLD}/scene/info"],
-                capture_output=True, text=True, timeout=2,
+                capture_output=True, text=True, timeout=5,
             )
             if service.returncode == 0 and "Service providers" in service.stdout:
                 return
