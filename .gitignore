@@ -1,0 +1,16 @@
+/.venv*/
+/runs/
+/build/
+/dist/
+*.egg-info/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+*.log
+.env
+.env.*
+*.pem
+*.key
+*.qcow2

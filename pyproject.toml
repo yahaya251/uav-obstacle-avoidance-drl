@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=65.5", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uav-obstacle-avoidance-drl"
+version = "0.1.0"
+description = "A planar obstacle-avoidance benchmark and a passive ROS 2 simulation monitor"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = []
+
+[project.optional-dependencies]
+benchmark = [
+    "numpy==1.26.4",
+    "gymnasium==1.0.0",
+    "stable-baselines3==2.5.0",
+    "torch==2.6.0",
+]
+plots = ["matplotlib>=3.8,<4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

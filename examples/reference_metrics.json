@@ -1,0 +1,549 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-11-05",
+  "evidence_scope": "archived_cpu_2d_kinematic_benchmark",
+  "runtime": {
+    "platform": "macOS ARM64",
+    "python": "3.11.9",
+    "torch": "2.6.0",
+    "numpy": "1.26.4"
+  },
+  "environment": {
+    "observation_dimensions": 40,
+    "sensor_beams": 720,
+    "sensor_range_m": 6,
+    "sector_count": 36,
+    "dt_s": 0.1,
+    "max_speed_m_s": 1,
+    "max_acceleration_m_s2": 1,
+    "stop_center_range_m": 0.55,
+    "max_steps": 240
+  },
+  "ppo": {
+    "policy": "MlpPolicy",
+    "training_seeds": [
+      0,
+      1,
+      2
+    ],
+    "checkpoint_selection": "highest_mean_validation_return_only",
+    "hyperparameters": {
+      "n_steps": 1024,
+      "batch_size": 128,
+      "n_epochs": 5,
+      "learning_rate": 0.0003,
+      "gamma": 0.99,
+      "gae_lambda": 0.95,
+      "clip_range": 0.2,
+      "net_arch": [
+        64,
+        64
+      ],
+      "device": "cpu",
+      "torch_threads": 1
+    }
+  },
+  "profiles": {
+    "exploratory": {
+      "training_steps_per_seed": 32768,
+      "validation_checkpoints": [
+        16384,
+        32768
+      ],
+      "selected_checkpoints": [
+        {
+          "training_seed": 0,
+          "selected_training_steps": 16384,
+          "validation_mean_return": 6.150913789578933
+        },
+        {
+          "training_seed": 1,
+          "selected_training_steps": 32768,
+          "validation_mean_return": 1.9133501703017561
+        },
+        {
+          "training_seed": 2,
+          "selected_training_steps": 32768,
+          "validation_mean_return": 2.523558597905522
+        }
+      ],
+      "layout_splits": {
+        "train": {
+          "count": 200,
+          "layout_seed_range_inclusive": [
+            0,
+            199
+          ]
+        },
+        "validation": {
+          "count": 20,
+          "layout_seed_range_inclusive": [
+            10000,
+            10019
+          ]
+        },
+        "test": {
+          "count": 60,
+          "layout_seed_range_inclusive": [
+            20000,
+            20059
+          ]
+        }
+      },
+      "test_layouts_by_family": {
+        "open": 12,
+        "single_obstacle": 12,
+        "staggered": 12,
+        "corridor": 12,
+        "u_trap": 12
+      },
+      "independent_archive_checks_passed": 16,
+      "test_results": [
+        {
+          "algorithm": "APF",
+          "training_seed": null,
+          "episodes": 60,
+          "success": 48,
+          "collision": 0,
+          "timeout": 12,
+          "success_rate": 0.8,
+          "mean_success_efficiency": 0.9458451492537457,
+          "mean_path_all_episodes_m": 7.354678922465083,
+          "median_episode_decision_p95_ms": 0.01047165,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 12
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 12
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 12
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 12
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        },
+        {
+          "algorithm": "GoalSeeking",
+          "training_seed": null,
+          "episodes": 60,
+          "success": 24,
+          "collision": 0,
+          "timeout": 36,
+          "success_rate": 0.4,
+          "mean_success_efficiency": 0.9890481168911921,
+          "mean_path_all_episodes_m": 4.94833333333333,
+          "median_episode_decision_p95_ms": 0.002625,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 12
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 0
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 0
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 12
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        },
+        {
+          "algorithm": "PPO",
+          "training_seed": 0,
+          "episodes": 60,
+          "success": 7,
+          "collision": 0,
+          "timeout": 53,
+          "success_rate": 0.11666666666666667,
+          "mean_success_efficiency": 0.9874546944729111,
+          "mean_path_all_episodes_m": 5.329576868613475,
+          "median_episode_decision_p95_ms": 0.06927604999999999,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 3
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 0
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 0
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 4
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        },
+        {
+          "algorithm": "PPO",
+          "training_seed": 1,
+          "episodes": 60,
+          "success": 0,
+          "collision": 0,
+          "timeout": 60,
+          "success_rate": 0.0,
+          "mean_success_efficiency": null,
+          "mean_path_all_episodes_m": 5.537958596992293,
+          "median_episode_decision_p95_ms": 0.06900674999999998,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 0
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 0
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 0
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 0
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        },
+        {
+          "algorithm": "PPO",
+          "training_seed": 2,
+          "episodes": 60,
+          "success": 0,
+          "collision": 0,
+          "timeout": 60,
+          "success_rate": 0.0,
+          "mean_success_efficiency": null,
+          "mean_path_all_episodes_m": 6.790112000413999,
+          "median_episode_decision_p95_ms": 0.06851427499999999,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 0
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 0
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 0
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 0
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        }
+      ]
+    },
+    "confirmation": {
+      "training_steps_per_seed": 300032,
+      "validation_checkpoints": [
+        100352,
+        200704,
+        300032
+      ],
+      "selected_checkpoints": [
+        {
+          "training_seed": 0,
+          "selected_training_steps": 200704,
+          "validation_mean_return": 27.459887950018754
+        },
+        {
+          "training_seed": 1,
+          "selected_training_steps": 200704,
+          "validation_mean_return": 26.304762056781016
+        },
+        {
+          "training_seed": 2,
+          "selected_training_steps": 300032,
+          "validation_mean_return": 27.52204699804563
+        }
+      ],
+      "layout_splits": {
+        "train": {
+          "count": 200,
+          "layout_seed_range_inclusive": [
+            0,
+            199
+          ]
+        },
+        "validation": {
+          "count": 20,
+          "layout_seed_range_inclusive": [
+            10000,
+            10019
+          ]
+        },
+        "test": {
+          "count": 60,
+          "layout_seed_range_inclusive": [
+            30000,
+            30059
+          ]
+        }
+      },
+      "test_layouts_by_family": {
+        "open": 12,
+        "single_obstacle": 12,
+        "staggered": 12,
+        "corridor": 12,
+        "u_trap": 12
+      },
+      "independent_archive_checks_passed": 16,
+      "test_results": [
+        {
+          "algorithm": "APF",
+          "training_seed": null,
+          "episodes": 60,
+          "success": 48,
+          "collision": 0,
+          "timeout": 12,
+          "success_rate": 0.8,
+          "mean_success_efficiency": 0.949396974570234,
+          "mean_path_all_episodes_m": 7.33020005084988,
+          "median_episode_decision_p95_ms": 0.010837425,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 12
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 12
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 12
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 12
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        },
+        {
+          "algorithm": "GoalSeeking",
+          "training_seed": null,
+          "episodes": 60,
+          "success": 24,
+          "collision": 0,
+          "timeout": 36,
+          "success_rate": 0.4,
+          "mean_success_efficiency": 0.9892401371635579,
+          "mean_path_all_episodes_m": 5.0799999999999965,
+          "median_episode_decision_p95_ms": 0.002625,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 12
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 0
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 0
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 12
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        },
+        {
+          "algorithm": "PPO",
+          "training_seed": 0,
+          "episodes": 60,
+          "success": 45,
+          "collision": 0,
+          "timeout": 15,
+          "success_rate": 0.75,
+          "mean_success_efficiency": 0.9366006637447375,
+          "mean_path_all_episodes_m": 7.37527103192936,
+          "median_episode_decision_p95_ms": 0.07117732499999999,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 12
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 10
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 11
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 12
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        },
+        {
+          "algorithm": "PPO",
+          "training_seed": 1,
+          "episodes": 60,
+          "success": 47,
+          "collision": 0,
+          "timeout": 13,
+          "success_rate": 0.7833333333333333,
+          "mean_success_efficiency": 0.9334405049397719,
+          "mean_path_all_episodes_m": 7.485992033614335,
+          "median_episode_decision_p95_ms": 0.068010175,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 12
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 11
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 12
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 12
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        },
+        {
+          "algorithm": "PPO",
+          "training_seed": 2,
+          "episodes": 60,
+          "success": 42,
+          "collision": 0,
+          "timeout": 18,
+          "success_rate": 0.7,
+          "mean_success_efficiency": 0.9458342777743105,
+          "mean_path_all_episodes_m": 7.268179567711318,
+          "median_episode_decision_p95_ms": 0.068483575,
+          "families": {
+            "open": {
+              "episodes": 12,
+              "success": 12
+            },
+            "single_obstacle": {
+              "episodes": 12,
+              "success": 10
+            },
+            "staggered": {
+              "episodes": 12,
+              "success": 9
+            },
+            "corridor": {
+              "episodes": 12,
+              "success": 11
+            },
+            "u_trap": {
+              "episodes": 12,
+              "success": 0
+            }
+          }
+        }
+      ],
+      "ppo_seed_mean_success_rate": 0.7444444444444445,
+      "ppo_seed_success_rate_range": [
+        0.7,
+        0.7833333333333333
+      ],
+      "near_obstacle_stops": [
+        {
+          "algorithm": "APF",
+          "training_seed": null,
+          "episodes_with_near_obstacle_stop": 0,
+          "total_stop_steps": 0,
+          "total_steps": 7829
+        },
+        {
+          "algorithm": "GoalSeeking",
+          "training_seed": null,
+          "episodes_with_near_obstacle_stop": 36,
+          "total_stop_steps": 7482,
+          "total_steps": 10800
+        },
+        {
+          "algorithm": "PPO",
+          "training_seed": 0,
+          "episodes_with_near_obstacle_stop": 13,
+          "total_stop_steps": 2788,
+          "total_steps": 8221
+        },
+        {
+          "algorithm": "PPO",
+          "training_seed": 1,
+          "episodes_with_near_obstacle_stop": 12,
+          "total_stop_steps": 2688,
+          "total_steps": 7699
+        },
+        {
+          "algorithm": "PPO",
+          "training_seed": 2,
+          "episodes_with_near_obstacle_stop": 15,
+          "total_stop_steps": 3210,
+          "total_steps": 8289
+        }
+      ]
+    }
+  },
+  "totals": {
+    "ppo_training_steps": 998400,
+    "test_episodes": 600
+  }
+}
