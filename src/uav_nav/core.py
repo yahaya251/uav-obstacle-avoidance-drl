@@ -1,6 +1,6 @@
 """ROS-independent observation, recommendation and monitoring contracts.
 
-水平FLU扫描→世界ENU36扇区；range/goal/velocity form 40 values.
+A horizontal FLU scan maps to 36 world ENU sectors; range, goal and velocity form 40 values.
 These development guards produce recommendations, not certified flight safety.
 """
 from dataclasses import dataclass, asdict
@@ -111,7 +111,7 @@ def pose_from_px4(position_ned, velocity_ned, q_wxyz, received_at,
     """PX4 Hamilton q(wxyz), FRD body → NED world. Reject other frame enums.
 
     NED/ENU origins must already coincide. No estimated-origin alignment occurs.
-    接收时间使用 monotonic，同源时间戳仅保留，不能混为消息年龄。
+    Use a monotonic clock for receipt time. Retain source timestamps separately from message age.
     """
     if pose_frame != 1 or velocity_frame != 1:
         raise ValueError('Only explicit PX4 NED pose_frame=1 and velocity_frame=1 are supported.')

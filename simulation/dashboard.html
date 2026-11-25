@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="uav-dashboard-version" content="uav-nav-dashboard-v1">
-<title>无人机实时监测</title>
+<title>Live UAV Monitor</title>
 <style>
 *{box-sizing:border-box}body{margin:0;color:#18334c;background:#edf1f4;font-family:Arial,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:1380px;margin:16px auto;padding:20px 26px 16px;background:#fff;border-top:7px solid #153f69}
 header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}h1{font-size:27px;margin:0 0 7px}h2{font-size:19px;margin:0 0 12px}p{margin:4px 0;font-size:14px;line-height:1.4}.sub{color:#5e7285;font-size:13px}.badge{padding:9px 12px;border-radius:4px;background:#e9edf1;font-size:13px;font-weight:bold}.good{background:#e7f3e9;color:#23643b}.bad{background:#fff0e7;color:#9b4418}.topline{margin:14px 0 15px;padding:9px 12px;background:#f2f6fa;font-size:14px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.layout{display:grid;grid-template-columns:1.05fr 1fr;gap:25px}.chart{background:#fbfcfd;border:1px solid #dce4ec;padding:10px 12px;min-width:0}.charthead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px}.charthead h2{margin:0}canvas{display:block;width:100%;height:394px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:13px 20px}.metric{border-bottom:1px solid #dce4ec;padding:2px 0 10px;min-width:0}.metric .label{font-size:12px;color:#567086;margin-bottom:7px}.metric .value{font-size:23px;font-weight:bold;line-height:1.1;overflow-wrap:anywhere}.metric .note{font-size:12px;color:#597083;margin-top:6px;line-height:1.4}.wide{grid-column:1/-1}.statusline{background:#eef4f8;border-left:4px solid #386786;padding:10px 12px;margin-top:15px;min-height:57px;font-size:14px;line-height:1.4}.statusline.rejected{border-color:#c57934;background:#fff5e8}.observation{margin-top:15px}.observation h2{font-size:16px;margin-bottom:5px}.bins{display:grid;grid-template-columns:repeat(36,minmax(0,1fr));gap:2px;height:41px;margin-top:7px}.bin{display:flex;align-items:center;justify-content:center;font-size:9px;color:#163c60;border:1px solid #d4e0e8;min-width:0}.tail{display:flex;justify-content:space-between;gap:15px;font-size:12px;color:#556e83;margin-top:8px}.foot{border-top:1px solid #dce4ec;padding-top:10px;margin-top:13px;font-size:12px;color:#596f82;line-height:1.45}.legend{font-size:11px;color:#567086;line-height:1.4}.state{font-size:18px;font-weight:bold}@media(max-width:900px){.layout{grid-template-columns:1fr}.bins{height:35px}main{margin:0;padding:15px}.tail{flex-wrap:wrap}}
@@ -138,7 +138,7 @@ const GUARDS = {
 };
 const $ = id => document.getElementById(id);
 // Each launcher opens a fixed-language URL. There are no in-page language controls or saved preferences.
-const language = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'zh';
+const language = new URLSearchParams(window.location.search).get('lang') === 'zh' ? 'zh' : 'en';
 let latest = null, lastSample = -1, lastAdvance = Date.now();
 // Preserve connection semantics when redrawing after window resizing.
 let viewState = 'waitingMonitor';
