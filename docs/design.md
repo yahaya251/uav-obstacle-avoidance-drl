@@ -35,8 +35,8 @@ The two archived runs recorded zero collisions across 600 test episodes. On the 
 
 Path efficiency divides the initial straight-line distance minus the goal radius by the distance traveled, for successful episodes only. The timing metric is the median across episodes of each episode's 95th percentile controller decision time. These metrics describe 2D kinematic behavior on static layouts. Training convergence, moving obstacles, closed-loop Gazebo/PX4 performance, and physical flights require separate validation.
 
-## Algorithm references / 算法参考
+## Algorithm references
 
-- PPO algorithm / PPO 算法. [Schulman et al. (2017)](https://arxiv.org/abs/1707.06347)
-- APF baseline concept / 人工势场基线的理论来源. [Khatib (1986)](https://khatib.stanford.edu/publications/pdfs/Khatib_1986_IJRR.pdf)
-- PPO library and API / PPO 训练库与接口. [Stable-Baselines3 2.5.0](https://stable-baselines3.readthedocs.io/en/v2.5.0/modules/ppo.html)
+- PPO algorithm. [Schulman et al. (2017)](https://arxiv.org/abs/1707.06347)
+- APF baseline concept. [Khatib (1986)](https://khatib.stanford.edu/publications/pdfs/Khatib_1986_IJRR.pdf)
+- PPO library and API. [Stable-Baselines3 2.5.0](https://stable-baselines3.readthedocs.io/en/v2.5.0/modules/ppo.html)

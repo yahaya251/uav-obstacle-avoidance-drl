@@ -13,31 +13,31 @@ header{display:flex;justify-content:space-between;align-items:center;gap:15px;fl
 <body>
 <main>
 <header>
-  <div><h1 data-i18n="heading">无人机实时监测</h1><p class="sub" data-i18n="subtitle">ROS 2 / Gazebo / PX4 · 传感器监测与核心接口验证</p></div>
-  <div id="connection" class="badge bad" role="status">等待监测节点</div>
+  <div><h1 data-i18n="heading">Live UAV Monitoring</h1><p class="sub" data-i18n="subtitle">ROS 2 / Gazebo / PX4 · Sensor monitoring and core interface validation</p></div>
+  <div id="connection" class="badge bad" role="status">WAITING FOR MONITOR</div>
 </header>
-<div class="topline"><span><b data-i18n="passive">被动监测模式</b> · <span data-i18n="passiveNote">仅订阅传感器并计算APF建议值</span></span><span><span data-i18n="flightLabel">本监测节点已发送飞行指令：</span><b id="flightCount">0</b></span></div>
+<div class="topline"><span><b data-i18n="passive">PASSIVE MODE</b> · <span data-i18n="passiveNote">Sensor subscriptions and APF recommendations only</span></span><span><span data-i18n="flightLabel">Flight commands sent by this monitor: </span><b id="flightCount">0</b></span></div>
 <div class="layout">
   <section class="chart" aria-labelledby="rangeHeading">
-    <div class="charthead"><h2 id="rangeHeading" data-i18n="rangeHeading">360°测距观测</h2><span id="coverage" class="sub">覆盖：— / 36</span></div>
-    <canvas id="polar" role="img" aria-label="世界ENU坐标系中的360度测距与建议速度"></canvas>
-    <div class="legend"><span data-i18n="legend">蓝色：已观测扇区 · 灰色：未知 · 橙色：建议速度</span><br><span data-i18n="chartNote">世界ENU坐标系：东→，北↑。距离环：1.5 / 3 / 4.5 / 6 m。未向算法提供障碍地图。</span></div>
+    <div class="charthead"><h2 id="rangeHeading" data-i18n="rangeHeading">360° range observation</h2><span id="coverage" class="sub">Coverage: — / 36</span></div>
+    <canvas id="polar" role="img" aria-label="360-degree ranges and recommended velocity in world ENU"></canvas>
+    <div class="legend"><span data-i18n="legend">Blue: observed sectors · Gray: unknown · Orange: recommended velocity</span><br><span data-i18n="chartNote">World ENU: East →, North ↑. Rings: 1.5 / 3 / 4.5 / 6 m. No obstacle map is supplied.</span></div>
   </section>
-  <section aria-label="实时监测参数" id="metricsSection">
+  <section aria-label="Live monitoring metrics" id="metricsSection">
     <div class="metrics">
-      <div class="metric"><div class="label" data-i18n="scanLabel">扫描</div><div class="value" id="scanHz">— Hz</div><div class="note" id="scanAge">接收年龄：— · — 束</div></div>
-      <div class="metric"><div class="label" data-i18n="odomLabel">PX4里程计</div><div class="value" id="odomHz">— Hz</div><div class="note" id="poseAge">接收年龄：—</div></div>
-      <div class="metric"><div class="label" data-i18n="positionLabel">ENU位置</div><div class="value" id="position">—, —, —</div><div class="note" data-i18n="positionNote">东、北、上（m）</div></div>
-      <div class="metric"><div class="label" data-i18n="velocityLabel">实测速度</div><div class="value" id="velocity">—, —</div><div class="note" data-i18n="velocityNote">东、北（m/s）</div></div>
-      <div class="metric"><div class="label" data-i18n="minimumLabel">最近测距</div><div class="value" id="minimum">— m</div><div class="note" data-i18n="minimumNote">保守停止建议门限：0.55 m</div></div>
-      <div class="metric"><div class="label" data-i18n="vehicleLabel">飞行器状态</div><div class="value" id="vehicle">—</div><div class="note" id="vehicleNote">等待PX4飞行器状态</div></div>
-      <div class="metric wide"><div class="label" data-i18n="actionLabel">限幅后的APF建议速度</div><div class="value" id="action">东 — · 北 — m/s</div><div class="note" id="actionReason">仅为建议值；未创建轨迹设定值或飞行指令发布者。</div></div>
+      <div class="metric"><div class="label" data-i18n="scanLabel">SCAN</div><div class="value" id="scanHz">— Hz</div><div class="note" id="scanAge">Age: — s · — rays</div></div>
+      <div class="metric"><div class="label" data-i18n="odomLabel">PX4 ODOMETRY</div><div class="value" id="odomHz">— Hz</div><div class="note" id="poseAge">Age: — s</div></div>
+      <div class="metric"><div class="label" data-i18n="positionLabel">POSITION ENU</div><div class="value" id="position">—, —, —</div><div class="note" data-i18n="positionNote">East, North, Up (m)</div></div>
+      <div class="metric"><div class="label" data-i18n="velocityLabel">MEASURED VELOCITY</div><div class="value" id="velocity">—, —</div><div class="note" data-i18n="velocityNote">East, North (m/s)</div></div>
+      <div class="metric"><div class="label" data-i18n="minimumLabel">MINIMUM RANGE</div><div class="value" id="minimum">— m</div><div class="note" data-i18n="minimumNote">Stop recommendation threshold: 0.55 m</div></div>
+      <div class="metric"><div class="label" data-i18n="vehicleLabel">VEHICLE STATE</div><div class="value" id="vehicle">—</div><div class="note" id="vehicleNote">Awaiting PX4 vehicle_status</div></div>
+      <div class="metric wide"><div class="label" data-i18n="actionLabel">LIMITED APF RECOMMENDATION</div><div class="value" id="action">East — · North — m/s</div><div class="note" id="actionReason">Recommendation only. No TrajectorySetpoint or VehicleCommand publishers.</div></div>
     </div>
-    <div id="validity" class="statusline rejected"><div class="state">等待数据</div><div id="reasons">需通过新鲜度、完整覆盖与坐标系检查。</div></div>
+    <div id="validity" class="statusline rejected"><div class="state">Waiting for data</div><div id="reasons">Freshness, complete coverage and frame checks must pass.</div></div>
   </section>
 </div>
-<section class="observation" aria-labelledby="observationHeading"><h2 id="observationHeading" data-i18n="observationHeading">40维观测 · 36个测距扇区 + 相对目标（2维）+ 实测速度（2维）</h2><div id="bins" class="bins"></div><div class="tail"><span data-i18n="sectorNote">扇区0朝东，角度逆时针增加；测距值除以6 m归一化。</span><span id="extraValues">目标：—, — · 速度：—, —</span></div></section>
-<div class="foot"><span id="counters">尚未收到监测采样。</span><br><span id="timestamp">—</span><br><span data-i18n="scope">范围：实时PX4/Gazebo观测与软件门限试运行。尚无机外飞行闭环、PPO训练或避障性能结论。</span></div>
+<section class="observation" aria-labelledby="observationHeading"><h2 id="observationHeading" data-i18n="observationHeading">40D observation · 36 range sectors + relative goal (2) + measured velocity (2)</h2><div id="bins" class="bins"></div><div class="tail"><span data-i18n="sectorNote">Sector 0 = East; angles increase counterclockwise. Range values are divided by 6 m.</span><span id="extraValues">Goal: —, — · Velocity: —, —</span></div></section>
+<div class="foot"><span id="counters">No monitor samples received.</span><br><span id="timestamp">—</span><br><span data-i18n="scope">Scope: live PX4/Gazebo observation and dry-run software guards. No offboard flight loop, PPO training or obstacle-avoidance performance claim.</span></div>
 </main>
 <script>
 // Localization changes presentation only. Raw API keys and control calculations are unchanged.
