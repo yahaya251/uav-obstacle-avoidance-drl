@@ -1,10 +1,11 @@
 # Development Environment
 
-The planar benchmark runs natively on macOS or Ubuntu. The passive simulator runs on Ubuntu 24.04, either directly or in a Lima guest on macOS. Keep the benchmark environment separate from the system Python used by ROS 2.
+The planar benchmark runs natively on Windows, macOS, and Ubuntu. The passive simulator runs on Ubuntu 24.04, either directly or in a Lima guest on macOS. Keep the benchmark environment separate from the system Python used by ROS 2.
 
 | Component | Project baseline |
 | --- | --- |
 | Planar benchmark | Python 3.11 or 3.12; NumPy 1.26.4, Gymnasium 1.0.0, Stable-Baselines3 2.5.0, PyTorch 2.6.0 |
+| Isaac Lab simulation | Windows 11 or Ubuntu x86-64; Python 3.12, Isaac Lab 3.0.0, Isaac Sim 6.2.0.0 and CUDA 13.0 PyTorch |
 | Plotting | Matplotlib `>=3.8,<4` |
 | Ubuntu simulator | Ubuntu 24.04 LTS, ROS 2 Jazzy, Gazebo Harmonic (Gazebo Sim 8), and `ros_gz_bridge` from Jazzy |
 | PX4 and messages | [PX4 Autopilot v1.17.0](https://github.com/PX4/PX4-Autopilot/releases/tag/v1.17.0) and [px4_msgs v1.17.0](https://github.com/PX4/px4_msgs/tree/v1.17.0) |
@@ -12,6 +13,22 @@ The planar benchmark runs natively on macOS or Ubuntu. The passive simulator run
 | Optional ground station | [QGroundControl v5.1.5](https://github.com/mavlink/qgroundcontrol/releases/tag/v5.1.5) |
 
 The main environment pins are in [`setup/versions.env`](../setup/versions.env). ROS and Gazebo packages come from their distribution repositories; installing on a later date can bring newer patch builds. The verified configuration used Gazebo Sim 8.15.0 and `ros_gz_bridge` 1.0.24. Use the [pinned PX4 v1.17 Ubuntu instructions](https://docs.px4.io/v1.17/en/dev_setup/dev_env_linux_ubuntu), [ROS 2 instructions](https://docs.px4.io/v1.17/en/ros2/user_guide), and [Gazebo instructions](https://docs.px4.io/v1.17/en/sim_gazebo_gz/) for reproduction. The current PX4 guides for [development environments](https://docs.px4.io/main/en/dev_setup/dev_env), [ROS 2](https://docs.px4.io/main/en/ros2/user_guide), and [Gazebo](https://docs.px4.io/main/en/sim_gazebo_gz/) cover additional combinations; they do not change this project's versions.
+
+## Native Windows
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) or set `UAV_UV` to a portable `uv.exe`. In PowerShell 7, open the repository root and run the commands below.
+
+```powershell
+.\setup\planar.ps1 setup
+.\setup\planar.ps1 core
+.\setup\planar.ps1 smoke
+```
+
+The planar runner installs the pinned CPU benchmark into `.venv-planar` and saves verified results and plots under `runs`. You can use `exploratory` and `confirmation` independently, or `full` for setup and all profiles. Set `UAV_PLANAR_VENV` or `UAV_PLANAR_RUNS` to change those paths.
+
+On an RTX workstation, use the [native Windows Isaac Lab setup](../isaac_lab/README.md#install-and-run-on-windows) for the parallel simulator. In a standalone clone, `.windows` holds the managed Python, package cache, CUDA environment, and portable Kit files. Inside the WIA3002 layout, the launchers use the shared `WIA3002/.windows` runtime. Windows GitHub Actions validates the planar workflow and the tensor math on CPU. Run the Isaac Lab smoke command locally to verify Kit and RTX.
+
+Use the Ubuntu setup below for ROS 2, Gazebo, PX4, and the passive telemetry monitor.
 
 ## Fresh macOS host
 

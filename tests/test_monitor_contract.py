@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import time
 import unittest
+from unittest.mock import patch
 
 project=Path(__file__).resolve().parents[1]
 source = project / 'simulation/monitor.py'
@@ -41,12 +42,17 @@ class MonitorContractTests(unittest.TestCase):
         self.assertAlmostEqual(progress.age(10.4),.3)
 
     def test_status_snapshot_isolation_and_expiring_server_age(self):
-        store=monitor.StatusStore()
-        store.update({'observation':{'ready':True},'flight_command_sent':False},time.monotonic()-.7)
-        first=store.snapshot()
-        first['observation']['ready']=False
-        self.assertTrue(store.snapshot()['observation']['ready'])
-        self.assertGreaterEqual(first['monitor_sample_age_s'],.7)
+        store = monitor.StatusStore()
+        store.update({'observation': {'ready': True}, 'flight_command_sent': False}, 10.0)
+        with patch.object(monitor.time, 'monotonic', return_value=10.7) as clock:
+            first = store.snapshot()
+            first['observation']['ready'] = False
+            clock.return_value = 11.0
+            second = store.snapshot()
+
+        self.assertTrue(second['observation']['ready'])
+        self.assertAlmostEqual(first['monitor_sample_age_s'], 0.7)
+        self.assertAlmostEqual(second['monitor_sample_age_s'], 1.0)
 
     def request(self,path,method='GET'):
         store=monitor.StatusStore()

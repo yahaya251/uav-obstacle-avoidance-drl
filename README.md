@@ -4,11 +4,23 @@ This research prototype compares proximal policy optimization (PPO), an artifici
 
 | What to run | Where | Start here |
 | --- | --- | --- |
-| Core checks and planar benchmark | macOS or Ubuntu, Python 3.11 or 3.12 | [Planar quick start](#planar-quick-start) |
+| Core checks and planar benchmark | Windows, macOS, or Ubuntu, Python 3.11 or 3.12 | [Planar quick start](#planar-quick-start) |
 | Passive SITL | Ubuntu 24.04, either native or a Lima guest on Apple Silicon | [Ubuntu installation and verification](simulation/README.md) |
+| Parallel Isaac Lab navigation research | Windows 11 or Ubuntu x86-64 with a supported NVIDIA RTX GPU | [Isaac Lab setup, evaluation and throughput](isaac_lab/README.md) |
+| Fresh Windows workstation setup | Native PowerShell and separate planar and CUDA runtimes | [Windows environment setup](docs/environment-setup.md#native-windows) |
 | Fresh Apple Silicon Mac setup | macOS for the benchmark; Lima for the Ubuntu simulator | [Environment setup](docs/environment-setup.md) |
 
 ## Planar quick start
+
+On Windows, install [uv](https://docs.astral.sh/uv/getting-started/installation/) and run the PowerShell 7 entry point from the repository root.
+
+```powershell
+.\setup\planar.ps1 setup
+.\setup\planar.ps1 core
+.\setup\planar.ps1 smoke
+```
+
+On macOS and Ubuntu, use the shell entry point below.
 
 With Python and Git installed, run `bash setup/planar.sh full` for setup, core checks and all three profiles. For a short first pass, use `bash setup/planar.sh setup` and `bash setup/planar.sh smoke`. The equivalent manual steps follow.
 
@@ -67,6 +79,7 @@ Each profile selects PPO checkpoints on validation layouts before evaluating the
 | `tests/` | Navigation and passive-monitor contract tests |
 | `simulation/` | Ubuntu SITL launcher, sensor bridge, passive monitor, and dashboard |
 | `setup/` | Planar runner, Ubuntu bootstrap, one-command SITL capture, pinned versions, and Lima configuration |
+| `isaac_lab/` | Optional Isaac Sim scene, vectorized sensing and motion, PPO, paired evaluation, and throughput checks |
 | `examples/reference_metrics.json` | Archived benchmark configuration and aggregate results |
 
 | Run output | What it records |
