@@ -37,7 +37,6 @@ Read the [NVIDIA Omniverse license](https://docs.isaacsim.omniverse.nvidia.com/6
 ```powershell
 .\isaac_lab\setup.ps1 run smoke --num-envs 1
 .\isaac_lab\setup.ps1 run smoke --num-envs 4
-.\isaac_lab\setup.ps1 run demo --num-envs 2 --viz kit
 .\isaac_lab\setup.ps1 run train --num-envs 32 --seed 7 --timesteps 32768 --rollout-steps 128 --output runs/isaac/ppo-seed-7
 .\isaac_lab\setup.ps1 run evaluate --suite validation --num-envs 20 --checkpoint runs/isaac/ppo-seed-7/ppo.zip
 .\isaac_lab\setup.ps1 run evaluate --suite test --num-envs 60 --checkpoint runs/isaac/ppo-seed-7/ppo.zip
@@ -47,6 +46,12 @@ foreach ($count in 1, 8, 16, 32, 64) {
 ```
 
 Each smoke run writes `manifest.json`, `layouts.json`, and `results.json` under `runs/isaac`. Check for `"status": "completed"` and `"passed": true` before using the training or throughput commands. For a fresh run, use an unused path after `--output`. Set `UAV_ISAAC_VENV` to select another environment or `UAV_ISAAC_PORTABLE_ROOT` to change where Kit stores logs and cache.
+
+To see APF navigation repeatedly in all five layouts, use `--loop` in its own PowerShell window. The runner saves the initial rollout results, then advances the demonstration one control step at a time. Each environment automatically resets at goal arrival, collision, or timeout. Use Kit's Pause and Play controls, and close its window when finished. For inspection of the last scene state after a single run, use `--keep-open`.
+
+```powershell
+.\isaac_lab\setup.ps1 run demo --num-envs 5 --viz kit --loop
+```
 
 ## Install and run on Ubuntu
 
@@ -65,10 +70,10 @@ The smoke test checks finite 40-value observations, open-route motion, arrival a
 
 ### Inspect the scene
 
-Use `--viz kit` from an RTX host with an interactive desktop. Headless runs use the default `none`. Two scenes show an open route and a seeded obstacle layout side by side.
+Use `--viz kit` from an RTX host with an interactive desktop. Five environments show one layout from each family. Use `--loop` for repeated movement or `--keep-open` for inspection after one rollout.
 
 ```bash
-"$isaac_python" isaac_lab/run.py demo --num-envs 2 --viz kit
+"$isaac_python" isaac_lab/run.py demo --num-envs 5 --viz kit --loop
 ```
 
 ### Train and evaluate on fixed layouts

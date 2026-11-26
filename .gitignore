@@ -1,5 +1,6 @@
 /.venv*/
 /.windows/
+/.ubuntu-runtime/
 /runs/
 /build/
 /dist/

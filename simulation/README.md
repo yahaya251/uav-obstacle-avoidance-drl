@@ -77,6 +77,14 @@ The launcher sources Jazzy and the message overlay automatically. For an existin
 
 ## 3. Start and verify
 
+From a configured Ubuntu 24.04 graphical desktop, install the project launchers from the repository root.
+
+```bash
+bash setup/ubuntu-desktop/install-desktop.sh --workspace
+```
+
+Open **00 Verify Capture and Keep Gazebo Open** to run the timed audit followed by a continuous Gazebo viewer. Open **05 Open UAV Dashboard** to view the English monitoring interface and **07 Stop UAV Simulator** to stop the continuous run. The desktop installer uses the project-local `.ubuntu-runtime` directory for captures and prior launcher copies. In the full WIA3002 layout, that directory is at the workspace root.
+
 To start the headless passive simulator, collect 45 seconds after readiness, and run the independent capture audit in one command:
 
 ```bash
@@ -103,7 +111,7 @@ bash simulation/run.sh scan
 - `check` validates fresh topics, 720 rays, 36 covered sectors, a 40-value observation, a recent disarmed PX4 status and the passive monitor's ROS graph.
 - `scan` checks angles and range validity from one complete Gazebo scan.
 
-Open the [local dashboard](http://127.0.0.1:8086/?lang=en). On an Ubuntu desktop with X11, `bash simulation/run.sh gui` attaches a Gazebo window. Use the browser dashboard when running under Xvfb.
+Open the local dashboard in your browser. On an Ubuntu desktop with X11, `bash simulation/run.sh gui` attaches a Gazebo window. Use the browser dashboard when running under Xvfb. [Local dashboard](http://127.0.0.1:8086/)
 
 Press Ctrl+C in the terminal that started a continuous run to close its processes and flush the monitor summary. Its interrupt exit status is 130. For a timed capture, start a separate run with `--duration`. The timer starts after readiness; start the checks while that run is active.
 

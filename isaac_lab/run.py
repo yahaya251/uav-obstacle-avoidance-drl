@@ -12,7 +12,7 @@ from pathlib import Path
 import platform
 import re
 import sys
-from time import perf_counter
+from time import perf_counter, sleep
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +48,10 @@ def parse_arguments():
         if mode == "demo":
             command.add_argument("--viz", choices=("none", "kit"), default="none", help="Use kit for a desktop window.")
             command.add_argument("--steps", type=positive_integer, default=240)
+            command.add_argument("--keep-open", action="store_true",
+                                 help="Keep the Kit viewport interactive after saving the demo results.")
+            command.add_argument("--loop", action="store_true",
+                                 help="Keep the APF demonstration running in Kit until the window closes.")
         elif mode == "train":
             command.add_argument("--timesteps", type=positive_integer, default=32768)
             command.add_argument("--rollout-steps", type=positive_integer, default=128)
@@ -65,6 +69,9 @@ def parse_arguments():
         parser.error("--seed must be between 0 and 4294967295.")
     if args.num_envs > 200:
         parser.error("--num-envs must be at most 200, the size of the fixed training layout pool.")
+    if args.mode == "demo" and args.viz != "kit" and (args.loop or args.keep_open):
+        option = "--loop" if args.loop else "--keep-open"
+        parser.error(f"{option} requires --viz kit.")
     if args.mode == "train":
         rollout_size = args.rollout_steps * args.num_envs
         if rollout_size < 2 or args.timesteps % rollout_size:
@@ -231,6 +238,35 @@ def benchmark(env, args):
             "transitions_per_second": args.steps * args.num_envs / elapsed}
 
 
+def frame_demo_layouts(env, half_world):
+    origins = env.scene.env_origins
+    bounds_min = origins.amin(dim=0)
+    bounds_max = origins.amax(dim=0)
+    east, north, up = ((bounds_min + bounds_max) / 2).tolist()
+    span = float((bounds_max[:2] - bounds_min[:2]).max()) + 2 * half_world
+    env.sim.set_camera_view(eye=(east + 0.3 * span, north - 0.6 * span, up + 1.1 * span),
+                            target=(east, north, up))
+
+
+def loop_demo(env, seed):
+    """Run the APF controller at a watchable pace and let each slot autoreset."""
+    import omni.timeline
+    import torch
+
+    timeline = omni.timeline.get_timeline_interface()
+    with torch.no_grad():
+        obs, _ = env.reset(seed=seed)
+        next_step = perf_counter()
+        while env.sim.is_running():
+            now = perf_counter()
+            if timeline.is_playing() and now >= next_step:
+                obs, *_ = env.step(env.geometry.apf_action(obs["policy"]))
+                next_step = now + env.step_dt
+            else:
+                env.sim.render()
+                sleep(1 / 30)
+
+
 def main():
     args = parse_arguments()
     system = platform.system()
@@ -254,7 +290,7 @@ def main():
     if not torch.cuda.is_available() or index >= torch.cuda.device_count():
         raise SystemExit(f"CUDA device {args.device} is not available. Run {setup} check.")
 
-    from uav_isaac.env_cfg import UAVEnvCfg
+    from uav_isaac.env_cfg import HALF_WORLD_M, UAVEnvCfg
 
     split, layouts = choose_layouts(args)
     cfg = UAVEnvCfg()
@@ -282,6 +318,7 @@ def main():
     write_json(output / "layouts.json", layouts)
     write_json(output / "manifest.json", manifest)
     launcher_args = {"device": args.device, "visualizer": getattr(args, "viz", "none"), "livestream": 0}
+    keep_open = args.mode == "demo" and (args.keep_open or args.loop)
     with ExitStack() as runtime:
         try:
             script_args = sys.argv
@@ -311,16 +348,32 @@ def main():
                 elif args.mode == "smoke":
                     result = smoke(env, layouts, args)
                 else:
+                    if args.viz == "kit":
+                        if not env.sim.has_gui:
+                            raise RuntimeError("Kit did not provide a visible simulation window.")
+                        frame_demo_layouts(env, HALF_WORLD_M)
                     rows = rollout(env, layouts, env.geometry.apf_action, seed=args.seed, max_steps=args.steps,
                                    name="APF")
                     result = {"episodes": rows, "summary": summarize(rows), "finished_slots": len(rows),
                               "unfinished_slots": len(layouts) - len(rows), "step_limit": args.steps}
+                # Save before the optional inspection loop and before Kit fast shutdown.
+                write_json(output / "results.json", result)
+                write_json(output / "manifest.json", {**manifest, "status": "completed"})
+                print(f"Completed Isaac Lab {args.mode}. Results: {output.resolve()}", flush=True)
+                if keep_open:
+                    try:
+                        if args.loop:
+                            print("Looping the APF demonstration. Close the Kit window to finish.", flush=True)
+                            loop_demo(env, args.seed)
+                        else:
+                            print("The Kit viewport stays open until you close its window.", flush=True)
+                            while env.sim.is_running():
+                                env.sim.render()
+                                sleep(1 / 30)
+                    except KeyboardInterrupt:
+                        pass
             finally:
                 env.close()
-            # Kit fast shutdown may terminate the process as soon as the context closes.
-            write_json(output / "results.json", result)
-            write_json(output / "manifest.json", {**manifest, "status": "completed"})
-            print(f"Completed Isaac Lab {args.mode}. Results: {output.resolve()}", flush=True)
         except KeyboardInterrupt:
             write_json(output / "manifest.json", {**manifest, "status": "interrupted"})
             raise
