@@ -2,12 +2,16 @@
 
 This research prototype compares proximal policy optimization (PPO), an artificial potential field (APF), and direct goal seeking on identical planar obstacle layouts. A separate software-in-the-loop (SITL) stack checks simulated LiDAR and flight-controller telemetry. The SITL monitor logs APF velocity recommendations while PX4 stays disarmed; it does not send flight commands or evaluate closed-loop avoidance.
 
+Use the repository guide to run the full Windows workflow, set up the Ubuntu desktop, or open the looping Isaac Lab demonstration. [Project and run guide](docs/project-and-run-guide.md) · [Release history](CHANGELOG.md)
+
 | What to run | Where | Start here |
 | --- | --- | --- |
 | Core checks and planar benchmark | Windows, macOS, or Ubuntu, Python 3.11 or 3.12 | [Planar quick start](#planar-quick-start) |
 | Passive SITL | Ubuntu 24.04, either native or a Lima guest on Apple Silicon | [Ubuntu installation and verification](simulation/README.md) |
 | Parallel Isaac Lab navigation research | Windows 11 or Ubuntu x86-64 with a supported NVIDIA RTX GPU | [Isaac Lab setup, evaluation and throughput](isaac_lab/README.md) |
 | Fresh Windows workstation setup | Native PowerShell and separate planar and CUDA runtimes | [Windows environment setup](docs/environment-setup.md#native-windows) |
+| Complete Windows validation | PowerShell 7 with the planar and RTX runtimes | [`setup/windows/Run-Windows.cmd`](setup/windows/Run-Windows.cmd) |
+| Ubuntu graphical SITL | Ubuntu 24.04 desktop with Gazebo and ROS 2 | [Ubuntu desktop workflow](docs/project-and-run-guide.md#3-set-up-the-ubuntu-desktop-simulation) |
 | Fresh Apple Silicon Mac setup | macOS for the benchmark; Lima for the Ubuntu simulator | [Environment setup](docs/environment-setup.md) |
 
 ## Planar quick start

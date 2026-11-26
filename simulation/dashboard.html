@@ -4,141 +4,111 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="uav-dashboard-version" content="uav-nav-dashboard-v1">
-<title>Live UAV Monitor</title>
+<title>Live UAV Monitoring</title>
 <style>
-*{box-sizing:border-box}body{margin:0;color:#18334c;background:#edf1f4;font-family:Arial,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:1380px;margin:16px auto;padding:20px 26px 16px;background:#fff;border-top:7px solid #153f69}
+*{box-sizing:border-box}body{margin:0;color:#18334c;background:#edf1f4;font-family:Arial,sans-serif}main{max-width:1380px;margin:16px auto;padding:20px 26px 16px;background:#fff;border-top:7px solid #153f69}
 header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}h1{font-size:27px;margin:0 0 7px}h2{font-size:19px;margin:0 0 12px}p{margin:4px 0;font-size:14px;line-height:1.4}.sub{color:#5e7285;font-size:13px}.badge{padding:9px 12px;border-radius:4px;background:#e9edf1;font-size:13px;font-weight:bold}.good{background:#e7f3e9;color:#23643b}.bad{background:#fff0e7;color:#9b4418}.topline{margin:14px 0 15px;padding:9px 12px;background:#f2f6fa;font-size:14px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.layout{display:grid;grid-template-columns:1.05fr 1fr;gap:25px}.chart{background:#fbfcfd;border:1px solid #dce4ec;padding:10px 12px;min-width:0}.charthead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px}.charthead h2{margin:0}canvas{display:block;width:100%;height:394px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:13px 20px}.metric{border-bottom:1px solid #dce4ec;padding:2px 0 10px;min-width:0}.metric .label{font-size:12px;color:#567086;margin-bottom:7px}.metric .value{font-size:23px;font-weight:bold;line-height:1.1;overflow-wrap:anywhere}.metric .note{font-size:12px;color:#597083;margin-top:6px;line-height:1.4}.wide{grid-column:1/-1}.statusline{background:#eef4f8;border-left:4px solid #386786;padding:10px 12px;margin-top:15px;min-height:57px;font-size:14px;line-height:1.4}.statusline.rejected{border-color:#c57934;background:#fff5e8}.observation{margin-top:15px}.observation h2{font-size:16px;margin-bottom:5px}.bins{display:grid;grid-template-columns:repeat(36,minmax(0,1fr));gap:2px;height:41px;margin-top:7px}.bin{display:flex;align-items:center;justify-content:center;font-size:9px;color:#163c60;border:1px solid #d4e0e8;min-width:0}.tail{display:flex;justify-content:space-between;gap:15px;font-size:12px;color:#556e83;margin-top:8px}.foot{border-top:1px solid #dce4ec;padding-top:10px;margin-top:13px;font-size:12px;color:#596f82;line-height:1.45}.legend{font-size:11px;color:#567086;line-height:1.4}.state{font-size:18px;font-weight:bold}@media(max-width:900px){.layout{grid-template-columns:1fr}.bins{height:35px}main{margin:0;padding:15px}.tail{flex-wrap:wrap}}
 </style>
 </head>
 <body>
 <main>
 <header>
-  <div><h1 data-i18n="heading">Live UAV Monitoring</h1><p class="sub" data-i18n="subtitle">ROS 2 / Gazebo / PX4 · Sensor monitoring and core interface validation</p></div>
+  <div><h1>Live UAV Monitoring</h1><p class="sub">ROS 2 / Gazebo / PX4 · Sensor monitoring and core interface validation</p></div>
   <div id="connection" class="badge bad" role="status">WAITING FOR MONITOR</div>
 </header>
-<div class="topline"><span><b data-i18n="passive">PASSIVE MODE</b> · <span data-i18n="passiveNote">Sensor subscriptions and APF recommendations only</span></span><span><span data-i18n="flightLabel">Flight commands sent by this monitor: </span><b id="flightCount">0</b></span></div>
+<div class="topline"><span><b>PASSIVE MODE</b> · <span>Sensor subscriptions and APF recommendations only</span></span><span><span>Flight commands sent by this monitor: </span><b id="flightCount">0</b></span></div>
 <div class="layout">
   <section class="chart" aria-labelledby="rangeHeading">
-    <div class="charthead"><h2 id="rangeHeading" data-i18n="rangeHeading">360° range observation</h2><span id="coverage" class="sub">Coverage: — / 36</span></div>
+    <div class="charthead"><h2 id="rangeHeading">360° range observation</h2><span id="coverage" class="sub">Coverage: — / 36</span></div>
     <canvas id="polar" role="img" aria-label="360-degree ranges and recommended velocity in world ENU"></canvas>
-    <div class="legend"><span data-i18n="legend">Blue: observed sectors · Gray: unknown · Orange: recommended velocity</span><br><span data-i18n="chartNote">World ENU: East →, North ↑. Rings: 1.5 / 3 / 4.5 / 6 m. No obstacle map is supplied.</span></div>
+    <div class="legend"><span>Blue: observed sectors · Gray: unknown · Orange: recommended velocity</span><br><span>World ENU: East →, North ↑. Rings: 1.5 / 3 / 4.5 / 6 m. No obstacle map is supplied.</span></div>
   </section>
   <section aria-label="Live monitoring metrics" id="metricsSection">
     <div class="metrics">
-      <div class="metric"><div class="label" data-i18n="scanLabel">SCAN</div><div class="value" id="scanHz">— Hz</div><div class="note" id="scanAge">Age: — s · — rays</div></div>
-      <div class="metric"><div class="label" data-i18n="odomLabel">PX4 ODOMETRY</div><div class="value" id="odomHz">— Hz</div><div class="note" id="poseAge">Age: — s</div></div>
-      <div class="metric"><div class="label" data-i18n="positionLabel">POSITION ENU</div><div class="value" id="position">—, —, —</div><div class="note" data-i18n="positionNote">East, North, Up (m)</div></div>
-      <div class="metric"><div class="label" data-i18n="velocityLabel">MEASURED VELOCITY</div><div class="value" id="velocity">—, —</div><div class="note" data-i18n="velocityNote">East, North (m/s)</div></div>
-      <div class="metric"><div class="label" data-i18n="minimumLabel">MINIMUM RANGE</div><div class="value" id="minimum">— m</div><div class="note" data-i18n="minimumNote">Stop recommendation threshold: 0.55 m</div></div>
-      <div class="metric"><div class="label" data-i18n="vehicleLabel">VEHICLE STATE</div><div class="value" id="vehicle">—</div><div class="note" id="vehicleNote">Awaiting PX4 vehicle_status</div></div>
-      <div class="metric wide"><div class="label" data-i18n="actionLabel">LIMITED APF RECOMMENDATION</div><div class="value" id="action">East — · North — m/s</div><div class="note" id="actionReason">Recommendation only. No TrajectorySetpoint or VehicleCommand publishers.</div></div>
+      <div class="metric"><div class="label">SCAN</div><div class="value" id="scanHz">— Hz</div><div class="note" id="scanAge">Age: — s · — rays</div></div>
+      <div class="metric"><div class="label">PX4 ODOMETRY</div><div class="value" id="odomHz">— Hz</div><div class="note" id="poseAge">Age: — s</div></div>
+      <div class="metric"><div class="label">POSITION ENU</div><div class="value" id="position">—, —, —</div><div class="note">East, North, Up (m)</div></div>
+      <div class="metric"><div class="label">MEASURED VELOCITY</div><div class="value" id="velocity">—, —</div><div class="note">East, North (m/s)</div></div>
+      <div class="metric"><div class="label">MINIMUM RANGE</div><div class="value" id="minimum">— m</div><div class="note">Stop recommendation threshold: 0.55 m</div></div>
+      <div class="metric"><div class="label">VEHICLE STATE</div><div class="value" id="vehicle">—</div><div class="note" id="vehicleNote">Awaiting PX4 vehicle_status</div></div>
+      <div class="metric wide"><div class="label">LIMITED APF RECOMMENDATION</div><div class="value" id="action">East — · North — m/s</div><div class="note" id="actionReason">Recommendation only. No TrajectorySetpoint or VehicleCommand publishers.</div></div>
     </div>
     <div id="validity" class="statusline rejected"><div class="state">Waiting for data</div><div id="reasons">Freshness, complete coverage and frame checks must pass.</div></div>
   </section>
 </div>
-<section class="observation" aria-labelledby="observationHeading"><h2 id="observationHeading" data-i18n="observationHeading">40D observation · 36 range sectors + relative goal (2) + measured velocity (2)</h2><div id="bins" class="bins"></div><div class="tail"><span data-i18n="sectorNote">Sector 0 = East; angles increase counterclockwise. Range values are divided by 6 m.</span><span id="extraValues">Goal: —, — · Velocity: —, —</span></div></section>
-<div class="foot"><span id="counters">No monitor samples received.</span><br><span id="timestamp">—</span><br><span data-i18n="scope">Scope: live PX4/Gazebo observation and dry-run software guards. No offboard flight loop, PPO training or obstacle-avoidance performance claim.</span></div>
+<section class="observation" aria-labelledby="observationHeading"><h2 id="observationHeading">40D observation · 36 range sectors + relative goal (2) + measured velocity (2)</h2><div id="bins" class="bins"></div><div class="tail"><span>Sector 0 = East; angles increase counterclockwise. Range values are divided by 6 m.</span><span id="extraValues">Goal: —, — · Velocity: —, —</span></div></section>
+<div class="foot"><span id="counters">No monitor samples received.</span><br><span id="timestamp">—</span><br><span>Scope: live PX4/Gazebo observation and dry-run software guards. No offboard flight loop, PPO training or obstacle-avoidance performance claim.</span></div>
 </main>
 <script>
-// Localization changes presentation only. Raw API keys and control calculations are unchanged.
 const TEXT = {
-  zh: {
-    title: '无人机实时监测', heading: '无人机实时监测',
-    subtitle: 'ROS 2 / Gazebo / PX4 · 传感器监测与核心接口验证',
-    passive: '被动监测模式', passiveNote: '仅订阅传感器并计算APF建议值',
-    flightLabel: '本监测节点已发送飞行指令：', unexpected: '异常：检测到发送标记',
-    rangeHeading: '360°测距观测', coverage: '覆盖：{count} / 36',
-    canvasLabel: '世界ENU坐标系中的360度测距与建议速度', metricsLabel: '实时监测参数',
-    legend: '蓝色：已观测扇区 · 灰色：未知 · 橙色：建议速度',
-    chartNote: '世界ENU坐标系：东→，北↑。距离环：1.5 / 3 / 4.5 / 6 m。未向算法提供障碍地图。',
-    scanLabel: '扫描', odomLabel: 'PX4里程计', positionLabel: 'ENU位置', positionNote: '东、北、上（m）',
-    velocityLabel: '实测速度', velocityNote: '东、北（m/s）', minimumLabel: '最近测距',
-    minimumNote: '保守停止建议门限：0.55 m', vehicleLabel: '飞行器状态', actionLabel: '限幅后的APF建议速度',
-    actionDefault: '仅为建议值；未创建轨迹设定值或飞行指令发布者。',
-    observationHeading: '40维观测 · 36个测距扇区 + 相对目标（2维）+ 实测速度（2维）',
-    sectorNote: '扇区0朝东，角度逆时针增加；测距值除以6 m归一化。',
-    extras: '目标：{goal} · 速度：{velocity}', noSamples: '尚未收到监测采样。',
-    scope: '范围：实时PX4/Gazebo观测与软件门限试运行。尚无机外飞行闭环、PPO训练或避障性能结论。',
-    waitingMonitor: '等待监测节点', waitingSample: '等待首个采样', connectionLost: '连接中断', monitorStale: '监测采样已过期',
-    connectedReady: '已连接 · 观测就绪', connectedRejected: '已连接 · 输入被拒绝',
-    waitingData: '等待数据', waitingChecks: '需通过新鲜度、完整覆盖与坐标系检查。',
-    unavailable: '面板数据不可用', unavailableNote: '无法确认实时建议值，请检查监测进程与连接。',
-    staleOverlay: '数据过期 / 连接中断',
-    ready: '40维观测已就绪', rejected: '40维观测被拒绝 → 零速度建议',
-    readyNote: '扫描与位姿新鲜、角度覆盖完整，NED/ENU坐标转换检查通过。',
-    scanAge: '接收年龄：{age} s · {rays} 束', poseAge: '接收年龄：{age} s',
-    armed: '已解锁', disarmed: '未解锁', awaitingVehicle: '等待PX4飞行器状态',
-    vehicleNote: '导航状态 {state} · 失效保护{failsafe}', failsafeOn: '已触发', failsafeOff: '未触发',
-    action: '东 {east} · 北 {north} m/s', guard: '门限结果：{reason} · 未向飞控发布指令',
-    sector: '扇区 {index}', sectorTitle: '扇区 {index}（{angle}°）：{range} m；{known}', observed: '已观测', unknown: '未知',
-    counters: '已运行 {elapsed} s · {samples} 次监测采样 · {ready} 次就绪 · {rejected} 次拒绝 · ENU目标 {goal} m',
-    timestamp: 'UTC时间 {utc} · 运行编号 {run}',
-    unknownReason: '未识别的观测原因（{code}）', unknownGuard: '未识别的门限结果（{code}）',
-    east: '东', north: '北', west: '西', south: '南'
-  },
-  en: {
-    title: 'Live UAV Monitoring', heading: 'Live UAV Monitoring',
-    subtitle: 'ROS 2 / Gazebo / PX4 · Sensor monitoring and core interface validation',
-    passive: 'PASSIVE MODE', passiveNote: 'Sensor subscriptions and APF recommendations only',
-    flightLabel: 'Flight commands sent by this monitor: ', unexpected: 'UNEXPECTED: send flag detected',
-    rangeHeading: '360° range observation', coverage: 'Coverage: {count} / 36',
-    canvasLabel: '360-degree ranges and recommended velocity in world ENU', metricsLabel: 'Live monitoring metrics',
-    legend: 'Blue: observed sectors · Gray: unknown · Orange: recommended velocity',
-    chartNote: 'World ENU: East →, North ↑. Rings: 1.5 / 3 / 4.5 / 6 m. No obstacle map is supplied.',
-    scanLabel: 'SCAN', odomLabel: 'PX4 ODOMETRY', positionLabel: 'POSITION ENU', positionNote: 'East, North, Up (m)',
-    velocityLabel: 'MEASURED VELOCITY', velocityNote: 'East, North (m/s)', minimumLabel: 'MINIMUM RANGE',
-    minimumNote: 'Stop recommendation threshold: 0.55 m', vehicleLabel: 'VEHICLE STATE', actionLabel: 'LIMITED APF RECOMMENDATION',
-    actionDefault: 'Recommendation only. No TrajectorySetpoint or VehicleCommand publishers.',
-    observationHeading: '40D observation · 36 range sectors + relative goal (2) + measured velocity (2)',
-    sectorNote: 'Sector 0 = East; angles increase counterclockwise. Range values are divided by 6 m.',
-    extras: 'Goal: {goal} · Velocity: {velocity}', noSamples: 'No monitor samples received.',
-    scope: 'Scope: live PX4/Gazebo observation and dry-run software guards. No offboard flight loop, PPO training or obstacle-avoidance performance claim.',
-    waitingMonitor: 'WAITING FOR MONITOR', waitingSample: 'WAITING FOR FIRST SAMPLE', connectionLost: 'CONNECTION LOST', monitorStale: 'MONITOR SAMPLES STALE',
-    connectedReady: 'CONNECTED · READY', connectedRejected: 'CONNECTED · INPUT REJECTED',
-    waitingData: 'Waiting for data', waitingChecks: 'Freshness, complete coverage and frame checks must pass.',
-    unavailable: 'Dashboard data unavailable', unavailableNote: 'No live recommendation can be confirmed. Check the monitor process and connection.',
-    staleOverlay: 'STALE / CONNECTION LOST',
-    ready: '40D observation READY', rejected: '40D observation REJECTED → zero recommendation',
-    readyNote: 'Fresh scan + pose; complete angular coverage; valid NED/ENU frames.',
-    scanAge: 'Age: {age} s · {rays} rays', poseAge: 'Age: {age} s',
-    armed: 'ARMED', disarmed: 'DISARMED', awaitingVehicle: 'Awaiting PX4 vehicle_status',
-    vehicleNote: 'Navigation state {state} · failsafe {failsafe}', failsafeOn: 'active', failsafeOff: 'inactive',
-    action: 'East {east} · North {north} m/s', guard: 'Guard: {reason} · no autopilot publications',
-    sector: 'Sector {index}', sectorTitle: 'Sector {index} ({angle}°): {range} m; {known}', observed: 'observed', unknown: 'unknown',
-    counters: 'Elapsed {elapsed} s · {samples} monitor samples · {ready} ready · {rejected} rejected · goal ENU {goal} m',
-    timestamp: 'UTC {utc} · run {run}',
-    unknownReason: 'Unrecognized observation reason ({code})', unknownGuard: 'Unrecognized guard result ({code})',
-    east: 'E', north: 'N', west: 'W', south: 'S'
-  }
+  unexpected: 'UNEXPECTED: send flag detected',
+  coverage: 'Coverage: {count} / 36',
+  actionDefault: 'Recommendation only. No TrajectorySetpoint or VehicleCommand publishers.',
+  extras: 'Goal: {goal} · Velocity: {velocity}',
+  noSamples: 'No monitor samples received.',
+  waitingMonitor: 'WAITING FOR MONITOR',
+  waitingSample: 'WAITING FOR FIRST SAMPLE',
+  connectionLost: 'CONNECTION LOST',
+  monitorStale: 'MONITOR SAMPLES STALE',
+  connectedReady: 'CONNECTED · READY',
+  connectedRejected: 'CONNECTED · INPUT REJECTED',
+  waitingData: 'Waiting for data',
+  waitingChecks: 'Freshness, complete coverage and frame checks must pass.',
+  unavailable: 'Dashboard data unavailable',
+  unavailableNote: 'No live recommendation can be confirmed. Check the monitor process and connection.',
+  staleOverlay: 'STALE / CONNECTION LOST',
+  ready: '40D observation READY',
+  rejected: '40D observation REJECTED → zero recommendation',
+  readyNote: 'Fresh scan + pose; complete angular coverage; valid NED/ENU frames.',
+  scanAge: 'Age: {age} s · {rays} rays',
+  poseAge: 'Age: {age} s',
+  armed: 'ARMED',
+  disarmed: 'DISARMED',
+  awaitingVehicle: 'Awaiting PX4 vehicle_status',
+  vehicleNote: 'Navigation state {state} · failsafe {failsafe}',
+  failsafeOn: 'active',
+  failsafeOff: 'inactive',
+  action: 'East {east} · North {north} m/s',
+  guard: 'Guard: {reason} · no autopilot publications',
+  sector: 'Sector {index}',
+  sectorTitle: 'Sector {index} ({angle}°): {range} m; {known}',
+  observed: 'observed',
+  unknown: 'unknown',
+  counters: 'Elapsed {elapsed} s · {samples} monitor samples · {ready} ready · {rejected} rejected · goal ENU {goal} m',
+  timestamp: 'UTC {utc} · run {run}',
+  unknownReason: 'Unrecognized observation reason ({code})',
+  unknownGuard: 'Unrecognized guard result ({code})',
+  east: 'E',
+  north: 'N',
+  west: 'W',
+  south: 'S',
 };
-// The backend retains these diagnostic codes. Only their human-readable labels are translated.
+// Provide readable labels for the diagnostic codes returned by the monitor.
 const REASONS = {
-  missing_or_invalid_pose: ['位姿缺失或无效', 'Missing or invalid pose'],
-  stale_or_future_pose: ['位姿已过期或接收时间超前', 'Stale or future-dated pose'],
-  tilt_exceeds_planar_assumption: ['倾角超出平面假设范围', 'Tilt exceeds planar assumption'],
-  measured_speed_exceeds_contract: ['实测速度超出接口约定', 'Measured speed exceeds contract'],
-  missing_or_invalid_scan_metadata: ['扫描元数据缺失或无效', 'Missing or invalid scan metadata'],
-  stale_or_future_scan: ['扫描已过期或接收时间超前', 'Stale or future-dated scan'],
-  scan_pose_reception_skew: ['扫描与位姿接收时间差过大', 'Scan–pose reception skew too large'],
-  scan_angular_gaps: ['扫描角间隙过大', 'Scan angular gaps'],
-  sensor_range_below_observation_contract: ['传感器量程小于观测接口要求', 'Sensor range below observation contract'],
-  invalid_range_samples: ['含无效测距采样', 'Invalid range samples'],
-  incomplete_360_degree_coverage: ['360°覆盖不完整', 'Incomplete 360° coverage'],
-  scan_source_timestamp_not_advancing: ['扫描源时间戳未变化', 'Scan source timestamp unchanged'],
-  odometry_source_timestamp_not_advancing: ['里程计源时间戳未变化', 'Odometry source timestamp unchanged']
+  missing_or_invalid_pose: 'Missing or invalid pose',
+  stale_or_future_pose: 'Stale or future-dated pose',
+  tilt_exceeds_planar_assumption: 'Tilt exceeds planar assumption',
+  measured_speed_exceeds_contract: 'Measured speed exceeds contract',
+  missing_or_invalid_scan_metadata: 'Missing or invalid scan metadata',
+  stale_or_future_scan: 'Stale or future-dated scan',
+  scan_pose_reception_skew: 'Scan–pose reception skew too large',
+  scan_angular_gaps: 'Scan angular gaps',
+  sensor_range_below_observation_contract: 'Sensor range below observation contract',
+  invalid_range_samples: 'Invalid range samples',
+  incomplete_360_degree_coverage: 'Incomplete 360° coverage',
+  scan_source_timestamp_not_advancing: 'Scan source timestamp unchanged',
+  odometry_source_timestamp_not_advancing: 'Odometry source timestamp unchanged'
 };
 const GUARDS = {
-  ok: ['正常', 'OK'],
-  limited: ['已施加速度或加速度限制', 'Speed or acceleration limited'],
-  observation_not_ready: ['观测未就绪', 'Observation not ready'],
-  invalid_dt: ['时间间隔无效', 'Invalid time step'],
-  invalid_minimum_range: ['最近距离无效', 'Invalid minimum range'],
-  minimum_range_stop: ['最近距离触发停止建议', 'Minimum-range stop recommendation'],
-  invalid_action: ['建议速度无效', 'Invalid action']
+  ok: 'OK',
+  limited: 'Speed or acceleration limited',
+  observation_not_ready: 'Observation not ready',
+  invalid_dt: 'Invalid time step',
+  invalid_minimum_range: 'Invalid minimum range',
+  minimum_range_stop: 'Minimum-range stop recommendation',
+  invalid_action: 'Invalid action'
 };
 const $ = id => document.getElementById(id);
-// Each launcher opens a fixed-language URL. There are no in-page language controls or saved preferences.
-const language = new URLSearchParams(window.location.search).get('lang') === 'zh' ? 'zh' : 'en';
 let latest = null, lastSample = -1, lastAdvance = Date.now();
 // Preserve connection semantics when redrawing after window resizing.
 let viewState = 'waitingMonitor';
@@ -149,10 +119,10 @@ for (let i = 0; i < 36; i++) {
   cells.push(cell); $('bins').append(cell);
 }
 function t(key, values = {}) {
-  return TEXT[language][key].replace(/\{(\w+)\}/g, (_, name) => String(values[name] ?? '—'));
+  return TEXT[key].replace(/\{(\w+)\}/g, (_, name) => String(values[name] ?? '—'));
 }
-function translatedCode(table, code, fallback) {
-  return Object.hasOwn(table, code) ? table[code][language === 'zh' ? 0 : 1] : t(fallback, {code});
+function codeLabel(table, code, fallback) {
+  return Object.hasOwn(table, code) ? table[code] : t(fallback, {code});
 }
 const number = (value, decimals = 2) => typeof value === 'number' && Number.isFinite(value) ? value.toFixed(decimals) : '—';
 const pair = (values, decimals = 2) => Array.isArray(values) ? values.slice(0, 2).map(v => number(v, decimals)).join(', ') : '—, —';
@@ -164,7 +134,7 @@ function draw(data, stale = false) {
   const ctx = canvas.getContext('2d');
   ctx.scale(ratio, ratio); ctx.clearRect(0, 0, w, h);
   const cx = w / 2, cy = h / 2, r = Math.min(w / 2 - 45, h / 2 - 24), scale = r / 6;
-  ctx.font = '11px Arial, "PingFang SC", sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 1;
+  ctx.font = '11px Arial, sans-serif'; ctx.textAlign = 'center'; ctx.lineWidth = 1;
   for (const ring of [1.5, 3, 4.5, 6]) {
     ctx.beginPath(); ctx.arc(cx, cy, ring * scale, 0, Math.PI * 2);
     ctx.strokeStyle = '#dce5ec'; ctx.stroke(); ctx.fillStyle = '#6e8292';
@@ -204,7 +174,7 @@ function draw(data, stale = false) {
   }
   if (stale) {
     ctx.fillStyle = 'rgba(255,255,255,.72)'; ctx.fillRect(0, h / 2 - 25, w, 50);
-    ctx.fillStyle = '#9b4418'; ctx.font = 'bold 19px Arial, "PingFang SC", sans-serif';
+    ctx.fillStyle = '#9b4418'; ctx.font = 'bold 19px Arial, sans-serif';
     ctx.fillText(t('staleOverlay'), cx, h / 2 + 7);
   }
 }
@@ -222,12 +192,12 @@ function renderSnapshot(data) {
   $('vehicle').textContent = data.vehicle ? t(data.vehicle.armed ? 'armed' : 'disarmed') : '—';
   $('vehicleNote').textContent = data.vehicle ? t('vehicleNote', {state: data.vehicle.nav_state, failsafe: t(data.vehicle.failsafe ? 'failsafeOn' : 'failsafeOff')}) : t('awaitingVehicle');
   $('action').textContent = t('action', {east: number(recommendation.velocity_enu[0], 3), north: number(recommendation.velocity_enu[1], 3)});
-  $('actionReason').textContent = t('guard', {reason: translatedCode(GUARDS, recommendation.reason, 'unknownGuard')});
+  $('actionReason').textContent = t('guard', {reason: codeLabel(GUARDS, recommendation.reason, 'unknownGuard')});
   $('actionReason').title = recommendation.reason;
   $('coverage').textContent = t('coverage', {count: observation.coverage.filter(Boolean).length});
   $('validity').className = 'statusline' + (observation.ready ? '' : ' rejected');
   $('validity').firstElementChild.textContent = t(observation.ready ? 'ready' : 'rejected');
-  $('reasons').textContent = observation.ready ? t('readyNote') : observation.reasons.map(code => translatedCode(REASONS, code, 'unknownReason')).join(' · ');
+  $('reasons').textContent = observation.ready ? t('readyNote') : observation.reasons.map(code => codeLabel(REASONS, code, 'unknownReason')).join(' · ');
   $('reasons').title = observation.ready ? '' : observation.reasons.join(' · ');
   for (let i = 0; i < 36; i++) {
     const value = observation.values[i], known = observation.coverage[i];
@@ -240,11 +210,6 @@ function renderSnapshot(data) {
   $('timestamp').textContent = t('timestamp', {utc: data.generated_at_utc, run: data.run_id.slice(0, 10)});
 }
 function render() {
-  document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
-  document.title = t('title');
-  document.querySelectorAll('[data-i18n]').forEach(element => {element.textContent = t(element.dataset.i18n);});
-  $('polar').setAttribute('aria-label', t('canvasLabel'));
-  $('metricsSection').setAttribute('aria-label', t('metricsLabel'));
   $('scanAge').textContent = t('scanAge', {age: '—', rays: '—'});
   $('poseAge').textContent = t('poseAge', {age: '—'});
   $('vehicleNote').textContent = t('awaitingVehicle');
