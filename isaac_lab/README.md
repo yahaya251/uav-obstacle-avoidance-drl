@@ -25,7 +25,7 @@ The tensor-level tests also run without Isaac Sim. An RTX workstation can run th
 
 ## Install and run on Windows
 
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/) or set `UAV_UV` to its executable, then open PowerShell 7 in the repository root. The launcher puts its managed Python, package cache, isolated Isaac environment, and Kit portable state in `.windows`. The WIA3002 folder layout uses its top-level `.windows` directory. NVIDIA's Python installation guide covers enabling Windows long paths if extraction fails on a long filename. [Isaac Sim Python installation](https://docs.isaacsim.omniverse.nvidia.com/6.2.0/installation/install_python.html)
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) or set `UAV_UV` to its executable, then open PowerShell 7 in the repository root. The launcher puts its managed Python, package cache, isolated Isaac environment, portable Kit state, and Warp kernel cache in `.windows`. The WIA3002 folder layout uses its top-level `.windows` directory. NVIDIA's Python installation guide covers enabling Windows long paths if extraction fails on a long filename. [Isaac Sim Python installation](https://docs.isaacsim.omniverse.nvidia.com/6.2.0/installation/install_python.html)
 
 ```powershell
 .\isaac_lab\setup.ps1 install
@@ -41,7 +41,7 @@ Read the [NVIDIA Omniverse license](https://docs.isaacsim.omniverse.nvidia.com/6
 .\isaac_lab\setup.ps1 run train --num-envs 32 --seed 7 --timesteps 32768 --rollout-steps 128 --output runs/isaac/ppo-seed-7
 .\isaac_lab\setup.ps1 run evaluate --suite validation --num-envs 20 --checkpoint runs/isaac/ppo-seed-7/ppo.zip
 .\isaac_lab\setup.ps1 run evaluate --suite test --num-envs 60 --checkpoint runs/isaac/ppo-seed-7/ppo.zip
-foreach ($count in 1, 8, 16, 32) {
+foreach ($count in 1, 8, 16, 32, 64) {
     .\isaac_lab\setup.ps1 run benchmark --num-envs $count --steps 256 --warmup 32
 }
 ```

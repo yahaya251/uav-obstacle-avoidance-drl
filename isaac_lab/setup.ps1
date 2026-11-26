@@ -54,14 +54,19 @@ if ($Action -eq 'run') {
         throw 'Run .\isaac_lab\setup.ps1 install first.'
     }
     $savedPortableRoot = $env:UAV_ISAAC_PORTABLE_ROOT
+    $savedWarpCache = $env:WARP_CACHE_PATH
     try {
         if (-not $env:UAV_ISAAC_PORTABLE_ROOT) {
             $env:UAV_ISAAC_PORTABLE_ROOT = Join-Path $runtime 'kit'
+        }
+        if (-not $env:WARP_CACHE_PATH) {
+            $env:WARP_CACHE_PATH = Join-Path $runtime 'warp'
         }
         & $python (Join-Path $PSScriptRoot 'run.py') @runArguments
         exit $LASTEXITCODE
     } finally {
         $env:UAV_ISAAC_PORTABLE_ROOT = $savedPortableRoot
+        $env:WARP_CACHE_PATH = $savedWarpCache
     }
 }
 
