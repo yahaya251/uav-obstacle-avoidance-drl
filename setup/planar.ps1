@@ -44,13 +44,13 @@ function Invoke-CheckedNative($Program, [string[]]$Arguments) {
 
 function Resolve-Uv {
     if ($env:UAV_UV) {
-        return (Get-Command -Name $env:UAV_UV -CommandType Application).Source
+        return (Get-Command -Name $env:UAV_UV -CommandType Application | Select-Object -First 1).Source
     }
     $portableUv = Join-Path $runtime 'uv\uv.exe'
     if (Test-Path -LiteralPath $portableUv -PathType Leaf) {
         return $portableUv
     }
-    $command = Get-Command -Name uv -CommandType Application -ErrorAction SilentlyContinue
+    $command = Get-Command -Name uv -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if (-not $command) {
         throw 'Install uv, or set UAV_UV to the full path of uv.exe.'
     }

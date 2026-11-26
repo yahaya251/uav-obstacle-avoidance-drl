@@ -65,7 +65,7 @@ if ($Action -eq 'run') {
     }
 }
 
-$gpu = Get-Command nvidia-smi.exe -CommandType Application -ErrorAction SilentlyContinue
+$gpu = Get-Command nvidia-smi.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
 if (-not $gpu) { throw 'Install a supported NVIDIA RTX driver so nvidia-smi.exe is available.' }
 Invoke-Checked $gpu.Source @('--query-gpu=name,driver_version,memory.total', '--format=csv')
 
@@ -74,7 +74,7 @@ if ($Action -eq 'install') {
     if (-not $uv) {
         $uv = Join-Path $runtime 'uv\uv.exe'
         if (-not (Test-Path -LiteralPath $uv -PathType Leaf)) {
-            $uv = (Get-Command uv.exe -CommandType Application -ErrorAction SilentlyContinue).Source
+            $uv = (Get-Command uv.exe -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1).Source
         }
     }
     if (-not $uv) {

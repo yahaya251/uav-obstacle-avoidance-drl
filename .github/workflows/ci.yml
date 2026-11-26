@@ -38,6 +38,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: actions/setup-python@v7
+        id: windows-python
         with:
           python-version: '3.12'
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
@@ -45,8 +46,9 @@ jobs:
           version: '0.13.10'
       - name: Run the PowerShell planar workflow
         shell: pwsh
+        env:
+          UAV_PYTHON: ${{ steps.windows-python.outputs.python-path }}
         run: |
-          $env:UAV_PYTHON = (Get-Command python -CommandType Application).Source
           .\setup\planar.ps1 setup
           .\setup\planar.ps1 core
           .\setup\planar.ps1 smoke
