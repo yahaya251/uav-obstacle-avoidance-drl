@@ -29,3 +29,32 @@ jobs:
           python -m pip install -e '.[benchmark]'
           python -m uav_nav.benchmark run --profile smoke --output runs/smoke
           python -m uav_nav.benchmark verify runs/smoke
+
+  verify-windows:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        id: windows-python
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: '0.13.10'
+      - name: Run the PowerShell planar workflow
+        shell: pwsh
+        env:
+          UAV_PYTHON: ${{ steps.windows-python.outputs.python-path }}
+        run: |
+          .\setup\planar.ps1 setup
+          .\setup\planar.ps1 core
+          .\setup\planar.ps1 smoke
+      - name: Test Isaac Lab observation and action math on CPU
+        shell: pwsh
+        run: |
+          .\isaac_lab\setup.ps1 help
+          $env:PYTHONPATH = Join-Path (Get-Location) 'isaac_lab'
+          .\.venv-planar\Scripts\python.exe -m unittest discover -s isaac_lab/tests -v
